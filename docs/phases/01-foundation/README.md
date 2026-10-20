@@ -26,3 +26,6 @@ Nginx is the inbound web entry point; Squid is the separate outbound forward pro
 
 ## Detailed notes
 - [Foundation troubleshooting and diagnostic sequence](troubleshooting.md)
+
+## Detailed notes
+- [Foundation troubleshooting and diagnostic sequence](troubleshooting.md)

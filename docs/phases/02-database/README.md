@@ -26,3 +26,6 @@ FLUSH PRIVILEGES;
 ```
 
 The real environment file is /etc/proxylab/proxylab.env and must remain outside Git. Recorded directory/file permissions were root:debian, directory 750 and file 640. The products endpoint returned HTTP 200 with four records in a recorded test; the request used curl -k, so TLS trust was not checked.
+
+## Detailed notes
+- [Database validation and troubleshooting](troubleshooting.md)

@@ -16,3 +16,6 @@ The parser check returned without error, but -Q checks without loading the profi
 Historical kernel logs on 20 October contained AppArmor DENIED events for getattr on dev/null under this profile. The base abstraction contained /dev/null rw, but the exact cause was not conclusively established. Later short-window query showed no new matching events; that does not guarantee future absence.
 
 Keep the profile in enforce mode, investigate specific denials, and avoid disabling AppArmor or making broad permission changes to work around service issues.
+
+## Detailed notes
+- [AppArmor denial investigation and evidence](troubleshooting-evidence.md)

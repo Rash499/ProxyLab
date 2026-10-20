@@ -48,3 +48,15 @@ These are lab values, not instructions to expose a VM publicly. Review all firew
 ## Secret handling
 
 Never commit /etc/proxylab/proxylab.env, real DB_PASSWORD values, TLS private keys, SSH private keys, database dumps, backup archives, Restic repository contents, tokens, or credentials. See [SECURITY.md](SECURITY.md).
+
+## Expanded phase notes and security assessment
+
+The phase landing pages now link to deeper runbooks covering actual troubleshooting incidents, command references, diagrams, validation evidence, and assessment limitations.
+
+- [Security assessment evidence](docs/phases/10-validation-resilience/security-assessment.md)
+- [Security assessment index and architecture](docs/security-assessment/README.md)
+- [Assessment matrix](docs/security-assessment/assessment-matrix.md)
+- [Backend failure/recovery runbook — pending execution](docs/phases/10-validation-resilience/backend-failover-runbook.md)
+- [Backup transfer troubleshooting](docs/phases/09-backup-disaster-recovery/transfer-troubleshooting.md)
+
+The documentation distinguishes recorded results from suggested commands and tests that remain pending. It does not claim a test passed unless supporting output was recorded.

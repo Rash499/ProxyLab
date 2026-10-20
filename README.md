@@ -60,3 +60,13 @@ The phase landing pages now link to deeper runbooks covering actual troubleshoot
 - [Backup transfer troubleshooting](docs/phases/09-backup-disaster-recovery/transfer-troubleshooting.md)
 
 The documentation distinguishes recorded results from suggested commands and tests that remain pending. It does not claim a test passed unless supporting output was recorded.
+
+## Expanded phase notes and security assessment
+
+- [Security assessment evidence](docs/phases/10-validation-resilience/security-assessment.md)
+- [Security assessment index and architecture](docs/security-assessment/README.md)
+- [Assessment matrix](docs/security-assessment/assessment-matrix.md)
+- [Backend failure/recovery runbook — pending execution](docs/phases/10-validation-resilience/backend-failover-runbook.md)
+- [Backup transfer troubleshooting](docs/phases/09-backup-disaster-recovery/transfer-troubleshooting.md)
+
+The documentation distinguishes recorded results from proposed tests. It does not claim a test passed unless supporting output was retained.

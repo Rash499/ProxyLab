@@ -35,7 +35,7 @@ flowchart TB
     DST --> VERIFY
     VERIFY -. "restore not yet validated" .-> RESTORE
   end
-  MANIFEST -->|"SSH / SCP · dedicated key"| DST
+  STAGE -->|"SSH / SCP · dedicated key"| DST
 ```
 
 ## Reverse proxy request flow

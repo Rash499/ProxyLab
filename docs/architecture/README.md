@@ -20,17 +20,22 @@ flowchart TB
     AA -. confines .-> B2
     SD["systemd hardening"] -. isolates .-> B1
     SD -. isolates .-> B2
-    DB --> BK["Backup staging<br/>/var/backups/proxylab/20261020_130223<br/>SQL dump + config archive + SHA256SUMS"]
+    subgraph DBBackup["Database and configuration backup"]
+      DB -->|"logical export (mysqldump)"| SQL["Database dump<br/>proxylab.sql"]
+      SQL --> STAGE["Timestamped backup set<br/>/var/backups/proxylab/20261020_130223"]
+      CFG["Configuration archive<br/>proxylab-configs.tar.gz"] --> STAGE
+      STAGE --> MANIFEST["SHA256SUMS<br/>integrity manifest"]
+    end
   end
   S --> Internet["Permitted external destinations"]
   subgraph Recovery["Backup VM — 192.168.6.143"]
-    DST["Received files<br/>/home/debian/proxylab-backups/20261020_130223"]
-    VERIFY["Checksum verification<br/>SQL: OK · config archive: OK"]
-    RESTORE["Isolated restore and validation<br/>PENDING"]
+    DST["Received backup files<br/>/home/debian/proxylab-backups/20261020_130223"]
+    VERIFY["Checksum verification<br/>proxylab.sql: OK<br/>config archive: OK"]
+    RESTORE["Isolated database/config restore<br/>PENDING"]
     DST --> VERIFY
     VERIFY -. "restore not yet validated" .-> RESTORE
   end
-  BK -->|"SSH / SCP · dedicated key"| DST
+  MANIFEST -->|"SSH / SCP · dedicated key"| DST
 ```
 
 ## Reverse proxy request flow

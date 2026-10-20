@@ -34,3 +34,7 @@ Never publish /etc/proxylab/proxylab.env. Keep backends bound to loopback and av
 ## Detailed notes
 - [API validation, error handling and incidents](api-validation-and-incidents.md)
 - [Flask/Gunicorn troubleshooting](troubleshooting.md)
+
+## Detailed notes
+- [API validation, error handling and incidents](api-validation-and-incidents.md)
+- [Flask/Gunicorn troubleshooting](troubleshooting.md)

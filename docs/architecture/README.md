@@ -50,7 +50,44 @@ flowchart LR
   ACL -->|Denied| D["Access denied"]
 ```
 
+## Backup and recovery architecture
+
+This diagram represents the **recorded ProxyLab file-transfer path**, separate from the Restic repository used in the backup-platform lab. The solid path was transferred and checksum-verified; the dotted recovery path is planned and remains pending validation.
+
+```mermaid
+flowchart LR
+  subgraph Source["ProxyLab source VM — 192.168.6.141"]
+    APP["Flask / Gunicorn + MariaDB"]
+    SNAP["Timestamped backup directory<br/>/var/backups/proxylab/20261020_130223"]
+    SQL["proxylab.sql"]
+    CFG["proxylab-configs.tar.gz"]
+    MANIFEST["SHA256SUMS"]
+    APP --> SNAP
+    SNAP --> SQL
+    SNAP --> CFG
+    SNAP --> MANIFEST
+  end
+  SNAP -->|"SSH / SCP<br/>dedicated key"| DEST["Backup VM — 192.168.6.143"]
+  subgraph Destination["Verified transfer destination"]
+    FILES["/home/debian/proxylab-backups/20261020_130223<br/>files recorded with mode 600"]
+    CHECK["sha256sum -c SHA256SUMS<br/>proxylab.sql: OK<br/>proxylab-configs.tar.gz: OK"]
+    FILES --> CHECK
+  end
+  DEST --> FILES
+  CHECK -. "next step — restore not yet validated" .-> RESTORE["Isolated restore workspace"]
+  RESTORE -. "validate after restore" .-> VALIDATE["Restore SQL into test DB<br/>check schema and known rows<br/>check config permissions<br/>test application health"]
+```
+
+### Backup/recovery interpretation
+
+- **Recorded:** backup artifacts were transferred from `192.168.6.141` to `192.168.6.143` over SSH/SCP using a dedicated key.
+- **Recorded:** `sha256sum -c SHA256SUMS` returned `proxylab.sql: OK` and `proxylab-configs.tar.gz: OK`.
+- **Destination caveat:** verified files were in `/home/debian/proxylab-backups/20261020_130223`, not `/backup/restic-repo`. Do not interpret this diagram as proof that the transferred files are Restic snapshots.
+- **Pending:** restore the SQL dump to a separate test database, inspect/extract the config archive in an isolated directory, validate data and permissions, test application recovery, and record elapsed time. Dotted arrows denote planned work, not a passed recovery test.
+- A checksum match proves integrity against the checksum manifest; it does not prove database consistency, application recovery, whole-VM recovery, immutability, or off-site protection.
+
 ## Boundaries
+
 - Nginx is the client-facing reverse proxy; backends bind to loopback.
 - Squid is a separate outbound forward-proxy path.
 - MariaDB is recorded on loopback, not directly exposed to the LAN.

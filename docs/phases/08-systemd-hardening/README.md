@@ -22,3 +22,6 @@ sudo systemd-analyze security proxylab.service --no-pager
 A historical Gunicorn error said there was no usable temporary directory. The workaround used /home/debian/.gunicorn/tmp owned by debian:debian with mode 700, and backend 1 used --worker-tmp-dir there.
 
 Recorded post-reboot validation reported all five services active, HTTPS health and products returned HTTP 200, and the profile was in enforce mode. Security scores are indicators, not guarantees; inspect each backend separately.
+
+## Detailed notes
+- [systemd hardening and Gunicorn temp-directory incident](troubleshooting-evidence.md)

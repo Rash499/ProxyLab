@@ -33,3 +33,7 @@ Notes describe a self-signed certificate with CN 192.168.6.141, valid 9 Oct 2026
 ## Detailed notes
 - [Nginx/TLS diagnostics and known limitations](nginx-tls-diagnostics.md)
 - [Nginx troubleshooting and 502 investigation](troubleshooting.md)
+
+## Detailed notes
+- [Nginx/TLS diagnostics and known limitations](nginx-tls-diagnostics.md)
+- [Nginx troubleshooting and 502 investigation](troubleshooting.md)

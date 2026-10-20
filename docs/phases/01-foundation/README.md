@@ -23,3 +23,6 @@ systemctl is-active nginx squid mariadb proxylab.service proxylab-backend2.servi
 ```
 
 Nginx is the inbound web entry point; Squid is the separate outbound forward proxy. Re-run inventory commands for fresh evidence.
+
+## Detailed notes
+- [Foundation troubleshooting and diagnostic sequence](troubleshooting.md)

@@ -16,3 +16,6 @@ Earlier sessions inspected service status, listener and ACLs. Exact raw output w
 
 ## Detailed notes
 - [Squid ACL troubleshooting and validation](troubleshooting.md)
+
+## Detailed notes
+- [Squid ACL troubleshooting and validation](troubleshooting.md)

@@ -29,3 +29,6 @@ The real environment file is /etc/proxylab/proxylab.env and must remain outside 
 
 ## Detailed notes
 - [Database validation and troubleshooting](troubleshooting.md)
+
+## Detailed notes
+- [Database validation and troubleshooting](troubleshooting.md)

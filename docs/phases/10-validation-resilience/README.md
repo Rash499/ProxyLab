@@ -50,3 +50,7 @@ Acceptance checklist:
 - [ ] Actual output and limitations are documented.
 
 TLS trust/hostname verification is also pending; test without -k using the intended hostname and trusted CA.
+
+## Detailed notes
+- [Security assessment evidence, commands and results](security-assessment.md)
+- [Controlled backend failure/recovery runbook — planned, not yet executed](backend-failover-runbook.md)

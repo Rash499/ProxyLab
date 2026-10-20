@@ -30,3 +30,7 @@ Both returned HTTP 200 in retained evidence.
 A historical startup error reported no usable temporary directory among /tmp, /var/tmp, /usr/tmp, and /opt/proxylab/app. The documented workaround created /home/debian/.gunicorn/tmp with owner debian:debian and mode 700; backend 1 used --worker-tmp-dir /home/debian/.gunicorn/tmp. Inspect the current unit before changing it.
 
 Never publish /etc/proxylab/proxylab.env. Keep backends bound to loopback and avoid returning internal database exceptions to API clients.
+
+## Detailed notes
+- [API validation, error handling and incidents](api-validation-and-incidents.md)
+- [Flask/Gunicorn troubleshooting](troubleshooting.md)

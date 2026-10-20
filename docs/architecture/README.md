@@ -2,6 +2,8 @@
 
 ## End-to-end lab topology
 
+This is the main system diagram, including the application path and the separately hosted backup/recovery path. The backup transfer and checksum verification are recorded; restore validation remains pending.
+
 ```mermaid
 flowchart TB
   Client["LAN clients<br/>192.168.6.0/24"] -->|"HTTP / HTTPS"| FW["Host firewall"]
@@ -18,8 +20,17 @@ flowchart TB
     AA -. confines .-> B2
     SD["systemd hardening"] -. isolates .-> B1
     SD -. isolates .-> B2
+    DB --> BK["Backup staging<br/>/var/backups/proxylab/20261020_130223<br/>SQL dump + config archive + SHA256SUMS"]
   end
   S --> Internet["Permitted external destinations"]
+  subgraph Recovery["Backup VM — 192.168.6.143"]
+    DST["Received files<br/>/home/debian/proxylab-backups/20261020_130223"]
+    VERIFY["Checksum verification<br/>SQL: OK · config archive: OK"]
+    RESTORE["Isolated restore and validation<br/>PENDING"]
+    DST --> VERIFY
+    VERIFY -. "restore not yet validated" .-> RESTORE
+  end
+  BK -->|"SSH / SCP · dedicated key"| DST
 ```
 
 ## Reverse proxy request flow
@@ -52,12 +63,12 @@ flowchart LR
 
 ## Backup and recovery architecture
 
-This diagram represents the **recorded ProxyLab file-transfer path**, separate from the Restic repository used in the backup-platform lab. The solid path was transferred and checksum-verified; the dotted recovery path is planned and remains pending validation.
+This detailed view expands the backup portion of the main topology. It represents the **recorded ProxyLab file-transfer path**, separate from the Restic repository used in the backup-platform lab. The solid path was transferred and checksum-verified; the dotted recovery path is planned and remains pending validation.
 
 ```mermaid
 flowchart LR
   subgraph Source["ProxyLab source VM — 192.168.6.141"]
-    APP["Flask / Gunicorn + MariaDB"]
+    APP["Application + MariaDB"]
     SNAP["Timestamped backup directory<br/>/var/backups/proxylab/20261020_130223"]
     SQL["proxylab.sql"]
     CFG["proxylab-configs.tar.gz"]

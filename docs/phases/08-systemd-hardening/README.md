@@ -25,3 +25,6 @@ Recorded post-reboot validation reported all five services active, HTTPS health 
 
 ## Detailed notes
 - [systemd hardening and Gunicorn temp-directory incident](troubleshooting-evidence.md)
+
+## Detailed notes
+- [systemd hardening and Gunicorn temp-directory incident](troubleshooting-evidence.md)

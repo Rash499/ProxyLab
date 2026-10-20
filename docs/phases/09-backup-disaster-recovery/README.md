@@ -34,3 +34,6 @@ The files were copied into the backup VM user's home directory, not recorded as 
 - [ ] Test application recovery from restored artifacts.
 - [ ] Record exact commands, outputs, cleanup and recovery time.
 - [ ] State whether this is file-, database-, application- or full-VM recovery.
+
+## Detailed notes
+- [Backup transfer troubleshooting and restore evidence](transfer-troubleshooting.md)

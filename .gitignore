@@ -1,0 +1,32 @@
+# Secrets and private keys
+*.key
+*.pem
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+proxylab.env
+id_ed25519*
+*backup_ed25519*
+secrets/
+private/
+
+# Database and backup data
+*.sql
+*.sql.gz
+*.tar
+*.tar.gz
+*.tgz
+SHA256SUMS
+restic-repo/
+backups/
+
+# Runtime
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log
+.DS_Store
+Thumbs.db

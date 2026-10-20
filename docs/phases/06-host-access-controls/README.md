@@ -17,3 +17,6 @@ sudo sshd -T | grep -Ei 'passwordauthentication|permitrootlogin|pubkeyauthentica
 ```
 
 Keep an existing SSH session open when changing access rules. Confirm console/recovery access before applying changes that could lock you out. Never publish private key contents. Project notes report key-only SSH and firewall restrictions; recapture current effective settings before final sign-off.
+
+## Detailed notes
+- [Firewall and SSH troubleshooting](troubleshooting.md)

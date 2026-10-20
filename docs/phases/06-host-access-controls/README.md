@@ -20,3 +20,6 @@ Keep an existing SSH session open when changing access rules. Confirm console/re
 
 ## Detailed notes
 - [Firewall and SSH troubleshooting](troubleshooting.md)
+
+## Detailed notes
+- [Firewall and SSH troubleshooting](troubleshooting.md)

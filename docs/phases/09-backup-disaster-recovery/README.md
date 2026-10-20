@@ -37,3 +37,6 @@ The files were copied into the backup VM user's home directory, not recorded as 
 
 ## Detailed notes
 - [Backup transfer troubleshooting and restore evidence](transfer-troubleshooting.md)
+
+## Detailed notes
+- [Backup transfer troubleshooting and restore evidence](transfer-troubleshooting.md)

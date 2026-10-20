@@ -19,3 +19,6 @@ Keep the profile in enforce mode, investigate specific denials, and avoid disabl
 
 ## Detailed notes
 - [AppArmor denial investigation and evidence](troubleshooting-evidence.md)
+
+## Detailed notes
+- [AppArmor denial investigation and evidence](troubleshooting-evidence.md)

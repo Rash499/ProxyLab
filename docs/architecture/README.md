@@ -21,9 +21,6 @@ flowchart TB
     SD["systemd hardening"] -. isolates .-> B1
     SD -. isolates .-> B2
     DB -->|"mysqldump"| BK["Backup set<br/>SQL dump + config archive<br/>SHA256SUMS"]
-    BK -->|"SSH / SCP"| DST["Backup VM<br/>192.168.6.143"]
-    DST --> VERIFY["Checksums verified"]
-    VERIFY -. "restore test pending" .-> RESTORE["Isolated restore"]
   end
   S --> Internet["Permitted external destinations"]
   subgraph Recovery["Backup VM — 192.168.6.143"]

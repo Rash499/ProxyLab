@@ -29,3 +29,7 @@ Both backend identities appeared in the retained 20-request output; one pair of 
 
 ## TLS caveat
 Notes describe a self-signed certificate with CN 192.168.6.141, valid 9 Oct 2026–9 Oct 2027. curl -k bypasses trust validation. Test chain and hostname separately without -k. The shown upstream uses default round-robin behavior; no active health-check directive was recorded, so do not claim active health checking.
+
+## Detailed notes
+- [Nginx/TLS diagnostics and known limitations](nginx-tls-diagnostics.md)
+- [Nginx troubleshooting and 502 investigation](troubleshooting.md)

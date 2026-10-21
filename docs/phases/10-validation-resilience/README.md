@@ -14,43 +14,30 @@ echo "=== Recent service errors ==="
 sudo journalctl -u proxylab.service --since "10 minutes ago" --no-pager -p err
 ```
 
-Recorded outputs: direct backends returned their healthy JSON with HTTP 200; six HTTPS requests succeeded and alternated backend identities; recent error-priority journal query returned '-- No entries --'. The HTTPS requests used -k, so TLS trust was not checked.
+Recorded outputs: direct backends returned their healthy JSON with HTTP 200; initial HTTPS requests succeeded and showed both backend identities. HTTPS checks used `-k`, so TLS trust was not checked.
 
-## Planned controlled failover — NOT YET EXECUTED
+## Controlled backend failure and recovery — completed 21 October 2026
 
-```mermaid
-flowchart TD
-  A["Baseline: both healthy"] --> B["Confirm service-to-port mapping"]
-  B --> C["Stop one confirmed backend only"]
-  C --> D["Repeat HTTPS requests through Nginx"]
-  D --> E{"Surviving backend responds?"}
-  E -->|Yes| F["Record observed failover"]
-  E -->|No| G["Capture errors and investigate"]
-  F --> H["Restart stopped service"]
-  G --> H
-  H --> I["Check both direct health endpoints"]
-  I --> J["Verify Nginx shows both backends again"]
-```
+**Result: passed for both single-backend service-stop scenarios.**
 
-Read-only discovery:
-```bash
-sudo ss -lntp | grep -E '127.0.0.1:(5000|5001)' || true
-systemctl list-units --type=service --all --no-legend | grep -Ei 'proxylab|gunicorn' || true
-sudo systemctl cat proxylab.service
-```
+| Test | Observed result |
+|---|---|
+| Baseline | Nginx, MariaDB and both backends active; ports 443, 5000 and 5001 listening; `nginx -t` successful; HTTPS `/health` and `/products` returned HTTP 200. |
+| Stop backend 1 (`proxylab.service`) | Backend 1 became inactive; backend 2 remained active; 8/8 health requests returned HTTP 200 from `backend-2`; products endpoint returned HTTP 200 and all four products. |
+| Restart backend 1 | Both services active; 8/8 health requests returned HTTP 200 and reached both backend identities; products endpoint returned HTTP 200. Gunicorn logs showed backend 1 listening on port 5000. |
+| Stop backend 2 (`proxylab-backend2.service`) | Backend 2 became inactive; backend 1 remained active; 8/8 health requests returned HTTP 200 from `backend-1`; products endpoint returned HTTP 200 and all four products. |
+| Restart backend 2 and final validation | Nginx, MariaDB and both backend services active; both backend ports listening; `nginx -t` successful; 10/10 health requests returned HTTP 200 and reached both identities; products endpoint returned HTTP 200 and all four products. |
 
-Safety: test only in the lab during a quiet period; keep SSH open; confirm mapping first; do not stop Nginx, MariaDB or the VM; restart the stopped backend promptly; preserve exact output. Do not describe passive behavior as active health checking or production-grade HA.
-
-Acceptance checklist:
-- [ ] Confirm stopped backend is unavailable directly.
-- [ ] Repeated Nginx HTTPS requests use the surviving backend, if actual behavior supports it.
-- [ ] Stopped service restarts successfully.
-- [ ] Both direct health checks pass after recovery.
-- [ ] Nginx shows both identities again.
-- [ ] Actual output and limitations are documented.
-
-TLS trust/hostname verification is also pending; test without -k using the intended hostname and trusted CA.
+### Evidence and limitations
+- The complete command-by-command transcript and observed results are in [Backend failure/recovery runbook](backend-failover-runbook.md).
+- Direct requests to the stopped backend port were not captured; its direct-failure response is not claimed as verified.
+- The test demonstrates observed failover for controlled systemd stops, not every application-crash scenario or production-grade HA. The inspected upstream does not have an active-health-check directive.
+- The check of `/var/log/nginx/error.log` returned no lines, but the virtual-host config specifies `/var/log/nginx/proxylab_error.log`; use the configured path in future checks.
+- HTTPS testing used `curl -k`; certificate trust and hostname verification remain pending.
+- No formal recovery-time measurement or RTO/RPO validation was performed.
 
 ## Detailed notes
 - [Security assessment evidence, commands and results](security-assessment.md)
-- [Controlled backend failure/recovery runbook — planned, not yet executed](backend-failover-runbook.md)
+- [Controlled backend failure/recovery runbook and recorded results](backend-failover-runbook.md)
+
+TLS trust/hostname verification remains pending; test without `-k` using the intended hostname and trusted CA.

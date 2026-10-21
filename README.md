@@ -4,6 +4,39 @@ A documented Debian 13 infrastructure lab using Nginx, Squid, Flask/Gunicorn, Ma
 
 > **Evidence policy:** This repository separates recorded results from pending tests. Where a verbatim terminal transcript was not retained, the document labels the result as a recorded summary rather than recreating an exact transcript.
 
+## Main architecture
+
+The diagram below shows the end-to-end ProxyLab topology, including the Nginx reverse-proxy path, Squid forward proxy, MariaDB, host hardening, and the separate backup VM. Backup transfer and checksum verification are recorded; restore validation is still pending. See the [full architecture documentation](docs/architecture/README.md) for detailed flows and test notes.
+
+```mermaid
+flowchart TB
+  Client["LAN clients<br/>192.168.6.0/24"] -->|"HTTP / HTTPS"| FW["Host firewall"]
+  Client -->|"Forward proxy :3128"| FW
+  Admin["Administrator"] -->|"SSH :22 / public key"| FW
+  subgraph VM["Debian 13 ProxyLab — 192.168.6.141"]
+    FW --> N["Nginx :80 / :443<br/>HTTP redirect + TLS termination"]
+    FW --> S["Squid :3128<br/>ACL-controlled forward proxy"]
+    N --> B1["Gunicorn / Flask<br/>127.0.0.1:5000"]
+    N --> B2["Gunicorn / Flask<br/>127.0.0.1:5001"]
+    B1 --> DB[("MariaDB<br/>127.0.0.1:3306")]
+    B2 --> DB
+    AA["AppArmor profile"] -. confines .-> B1
+    AA -. confines .-> B2
+    SD["systemd hardening"] -. isolates .-> B1
+    SD -. isolates .-> B2
+    DB -->|"mysqldump"| BK["Timestamped backup set<br/>SQL dump + config archive<br/>SHA256SUMS"]
+  end
+  S --> Internet["Permitted external destinations"]
+  subgraph Recovery["Backup VM — 192.168.6.143"]
+    DST["Received backup files"]
+    VERIFY["Checksum verification<br/>SQL: OK · Configs: OK"]
+    RESTORE["Isolated restore<br/>VALIDATION STATUS: PENDING"]
+    DST --> VERIFY
+    VERIFY -. "restore not yet validated" .-> RESTORE
+  end
+  BK -->|"SSH / SCP"| DST
+```
+
 ## Documentation map
 
 - [Architecture diagrams](docs/architecture/README.md)

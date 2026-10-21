@@ -13,7 +13,7 @@ flowchart TB
   Client["LAN clients<br/>192.168.6.0/24"] -->|"HTTP / HTTPS"| FW["Host firewall"]
   Client -->|"Forward proxy :3128"| FW
   Admin["Administrator"] -->|"SSH :22 / public key"| FW
-  subgraph VM["Debian 13 ProxyLab — 192.168.6.141"]
+  subgraph VM["Debian 13 ProxyLab — 192.168.xxx.xxx"]
     FW --> N["Nginx :80 / :443<br/>HTTP redirect + TLS termination"]
     FW --> S["Squid :3128<br/>ACL-controlled forward proxy"]
     N --> B1["Gunicorn / Flask<br/>127.0.0.1:5000"]
@@ -27,7 +27,7 @@ flowchart TB
     DB -->|"mysqldump"| BK["Timestamped backup set<br/>SQL dump + config archive<br/>SHA256SUMS"]
   end
   S --> Internet["Permitted external destinations"]
-  subgraph Recovery["Backup VM — 192.168.6.143"]
+  subgraph Recovery["Backup VM — 192.168.xxx.xxx"]
     DST["Received backup files"]
     VERIFY["Checksum verification<br/>SQL: OK · Configs: OK"]
     RESTORE["Isolated restore<br/>VALIDATION STATUS: PENDING"]

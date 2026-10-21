@@ -41,32 +41,22 @@ These are lab values, not instructions to expose a VM publicly. Review all firew
 
 ## Status summary
 
-**Recorded as demonstrated:** direct health checks for both backends; HTTPS /health and /products returned HTTP 200; Nginx responses showed both backend identities; AppArmor profile proxylab-gunicorn was observed in enforce mode; inspected systemd hardening settings; SQL/config archive transferred to a separate VM and checksums matched.
+**Demonstrated:** direct health checks for both backends; HTTPS `/health` and `/products` returned HTTP 200; Nginx responses showed both backend identities; controlled stop/restart tests for each backend completed successfully on 21 October 2026; when either one backend service was stopped, eight health requests and the products endpoint continued returning HTTP 200 through the surviving backend; after recovery, both services and ports were active and 10 final health requests reached both identities; AppArmor profile `proxylab-gunicorn` was observed in enforce mode; inspected systemd hardening settings; SQL/config archive transferred to a separate VM and checksums matched.
 
-**Pending or requiring fresh evidence:** controlled backend stop/failover/restart; TLS hostname and trust-chain verification without curl -k; isolated database/config restore followed by application validation; fresh final Squid/firewall/SSH evidence.
+**Pending or requiring fresh evidence:** TLS hostname and trust-chain verification without `curl -k`; isolated database/config restore followed by application validation; direct failure response from the stopped backend port (not captured during the failover test); fresh final Squid/firewall/SSH evidence. The Nginx upstream has no active-health-check directive, so the completed tests demonstrate the observed behavior for controlled systemd stops rather than production-grade HA.
 
 ## Secret handling
 
-Never commit /etc/proxylab/proxylab.env, real DB_PASSWORD values, TLS private keys, SSH private keys, database dumps, backup archives, Restic repository contents, tokens, or credentials. See [SECURITY.md](SECURITY.md).
+Never commit `/etc/proxylab/proxylab.env`, real `DB_PASSWORD` values, TLS private keys, SSH private keys, database dumps, backup archives, Restic repository contents, tokens, or credentials. See [SECURITY.md](SECURITY.md).
 
 ## Expanded phase notes and security assessment
 
-The phase landing pages now link to deeper runbooks covering actual troubleshooting incidents, command references, diagrams, validation evidence, and assessment limitations.
+The phase landing pages link to deeper runbooks covering actual troubleshooting incidents, command references, diagrams, validation evidence, and assessment limitations.
 
 - [Security assessment evidence](docs/phases/10-validation-resilience/security-assessment.md)
 - [Security assessment index and architecture](docs/security-assessment/README.md)
 - [Assessment matrix](docs/security-assessment/assessment-matrix.md)
-- [Backend failure/recovery runbook — pending execution](docs/phases/10-validation-resilience/backend-failover-runbook.md)
-- [Backup transfer troubleshooting](docs/phases/09-backup-disaster-recovery/transfer-troubleshooting.md)
-
-The documentation distinguishes recorded results from suggested commands and tests that remain pending. It does not claim a test passed unless supporting output was recorded.
-
-## Expanded phase notes and security assessment
-
-- [Security assessment evidence](docs/phases/10-validation-resilience/security-assessment.md)
-- [Security assessment index and architecture](docs/security-assessment/README.md)
-- [Assessment matrix](docs/security-assessment/assessment-matrix.md)
-- [Backend failure/recovery runbook — pending execution](docs/phases/10-validation-resilience/backend-failover-runbook.md)
+- [Backend failure/recovery runbook with completed test evidence](docs/phases/10-validation-resilience/backend-failover-runbook.md)
 - [Backup transfer troubleshooting](docs/phases/09-backup-disaster-recovery/transfer-troubleshooting.md)
 
 The documentation distinguishes recorded results from proposed tests. It does not claim a test passed unless supporting output was retained.

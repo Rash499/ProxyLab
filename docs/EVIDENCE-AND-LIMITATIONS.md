@@ -12,8 +12,8 @@
 | systemd hardening | Partial/settings-specific | Both services later recorded NoNewPrivileges=yes, PrivateTmp=no; inspect each unit. |
 | Squid/UFW/SSH | Previously inspected | Re-capture exact current output for final validation. |
 | Backup transfer | Checksums matched | Transfer was to backup VM user's home directory. |
-| Full restore | Pending full demonstration | Perform isolated SQL/config restore and application checks. |
-| Backend failure/recovery | Pending | Controlled backend stop is not recorded as executed. |
+| Isolated DB/application restore | Passed | SQL restored to `proxylab_restore_test`; four expected rows queried through SELECT-only account; recovery `/health` and `/products` returned HTTP 200. Full-VM recovery/production cutover not tested. |
+| Backend failure/recovery | Passed for tested scenarios | Controlled stop/restart of each backend completed; 8/8 requests succeeded through the surviving backend per stop scenario. Direct stopped-port response not captured. |
 | TLS trust/hostname | Pending | Test using intended hostname and trusted CA without -k. |
 
 ## Recorded health responses

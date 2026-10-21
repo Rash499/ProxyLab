@@ -13,9 +13,9 @@
 | Gunicorn temp directory | Dedicated owner-only temp path resolved startup failure | Recorded fix validated |
 | Squid ACLs | Service/listener/ACL inspected earlier | Capture fresh complete output and functional allow/deny tests |
 | Firewall / SSH | Previously inspected | Capture fresh current output |
-| Backup transfer | Source/destination SHA-256 checks matched | Transfer integrity only; restore evidence must be scoped accurately |
+| Backup transfer and isolated restore | SHA-256 checks matched; SQL restored; four expected rows queried; recovery API returned HTTP 200 for `/health` and `/products` | Isolated DB/application recovery validated; full-VM recovery/production cutover not tested |
 | TLS trust | Not proven by `curl -k` | Pending test with correct hostname/SAN and trusted CA |
-| Backend failover | Intentional backend stop not recorded in latest assessment | Pending; use failover runbook |
+| Backend failover | Both controlled backend stop/restart scenarios completed; surviving backend served all 8/8 health requests per stop scenario | Direct stopped-port response not captured; no active upstream health checks |
 
 ## Evidence labels
 - **Validated:** test was executed and supporting output retained.

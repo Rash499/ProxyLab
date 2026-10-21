@@ -132,9 +132,9 @@ Post-reboot notes recorded all five services active: `proxylab.service`, `proxyl
 |---|---|---|
 | Nginx upstream | Two loopback upstreams configured | Re-run nginx -t for fresh evidence |
 | HTTPS health/products | HTTP 200 | Historical tests used curl -k; trust/hostname pending |
-| Load balancing | Both identities observed | Controlled backend failure/recovery still required |
+| Load balancing | Both identities observed | Controlled backend failure/recovery completed for the tested scenarios |
 | AppArmor | Enforce mode observed | Historical /dev/null denial root cause unresolved |
 | systemd hardening | Inspected; score 4.6 at one point | Recheck both effective units; PrivateTmp later no |
 | Squid/firewall/SSH | Earlier inspection reported | Capture fresh complete output |
-| Backup transfer | SHA-256 checksums matched | Transfer integrity does not prove restore |
-| Backend failover | Planned | Use the separate failover runbook |
+| Backup and isolated restore | SHA-256 checksums matched; isolated SQL restore and API checks passed | Full-VM recovery and production cutover not tested |
+| Backend failover | Controlled stop/restart of both backends passed for tested scenarios | Direct stopped-port response not captured; no active upstream health checks |

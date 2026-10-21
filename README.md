@@ -6,7 +6,7 @@ A documented Debian 13 infrastructure lab using Nginx, Squid, Flask/Gunicorn, Ma
 
 ## Main architecture
 
-The diagram below shows the end-to-end ProxyLab topology, including the Nginx reverse-proxy path, Squid forward proxy, MariaDB, host hardening, and the separate backup VM. Backup transfer and checksum verification are recorded; restore validation is still pending. See the [full architecture documentation](docs/architecture/README.md) for detailed flows and test notes.
+The diagram below shows the end-to-end ProxyLab topology, including the Nginx reverse-proxy path, Squid forward proxy, MariaDB, host hardening, and the separate backup VM. Backup transfer, checksum verification, and isolated database/application restore validation are complete. Full-VM recovery and production cutover have not been tested. See the [full architecture documentation](docs/architecture/README.md) for detailed flows and test notes.
 
 ```mermaid
 flowchart TB
@@ -30,9 +30,9 @@ flowchart TB
   subgraph Recovery["Backup VM — 192.168.xxx.xxx"]
     DST["Received backup files"]
     VERIFY["Checksum verification<br/>SQL: OK · Configs: OK"]
-    RESTORE["Isolated restore<br/>VALIDATION STATUS: PENDING"]
+    RESTORE["Isolated DB + application restore<br/>VALIDATED: SQL + API checks passed"]
     DST --> VERIFY
-    VERIFY -. "restore not yet validated" .-> RESTORE
+    VERIFY -->|"isolated recovery tested"| RESTORE
   end
   BK -->|"SSH / SCP"| DST
 ```
@@ -76,7 +76,7 @@ These are lab values, not instructions to expose a VM publicly. Review all firew
 
 **Demonstrated:** direct health checks for both backends; HTTPS `/health` and `/products` returned HTTP 200; Nginx responses showed both backend identities; controlled stop/restart tests for each backend completed successfully on 21 October 2026; when either one backend service was stopped, eight health requests and the products endpoint continued returning HTTP 200 through the surviving backend; after recovery, both services and ports were active and 10 final health requests reached both identities; AppArmor profile `proxylab-gunicorn` was observed in enforce mode; inspected systemd hardening settings; SQL/config archive transferred to a separate VM and checksums matched.
 
-**Pending or requiring fresh evidence:** TLS hostname and trust-chain verification without `curl -k`; isolated database/config restore followed by application validation; direct failure response from the stopped backend port (not captured during the failover test); fresh final Squid/firewall/SSH evidence. The Nginx upstream has no active-health-check directive, so the completed tests demonstrate the observed behavior for controlled systemd stops rather than production-grade HA.
+**Pending or requiring fresh evidence:** TLS hostname and trust-chain verification without `curl -k`; direct failure response from the stopped backend port (not captured during the failover test); fresh final Squid/firewall/SSH evidence; full-VM recovery, production cutover, and measured RTO/RPO (not part of the completed isolated restore test). The Nginx upstream has no active-health-check directive, so the completed tests demonstrate the observed behavior for controlled systemd stops rather than production-grade HA.
 
 ## Secret handling
 

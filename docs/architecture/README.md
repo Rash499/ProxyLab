@@ -2,7 +2,7 @@
 
 ## End-to-end lab topology
 
-This is the main system diagram, including the application path and the separately hosted backup/recovery path. The backup transfer and checksum verification are recorded; restore validation remains pending.
+This is the main system diagram, including the application path and the separately hosted backup/recovery path. Backup transfer, checksum verification, and isolated database/application restore validation are complete. Full-VM recovery and production cutover remain out of scope.
 
 ```mermaid
 flowchart TB
@@ -26,9 +26,9 @@ flowchart TB
   subgraph Recovery["Backup VM — 192.168.6.143"]
     DST["Received backup files"]
     VERIFY["Checksum verification<br/>SQL: OK · Configs: OK"]
-    RESTORE["Isolated restore<br/>PENDING"]
+    RESTORE["Isolated DB + application restore<br/>VALIDATED: SQL + API checks passed"]
     DST --> VERIFY
-    VERIFY -. "restore not yet validated" .-> RESTORE
+    VERIFY -->|"isolated recovery tested"| RESTORE
   end
   BK --> DST
 ```
@@ -63,7 +63,7 @@ flowchart LR
 
 ## Backup and recovery architecture
 
-This detailed view expands the backup portion of the main topology. It represents the **recorded ProxyLab file-transfer path**, separate from the Restic repository used in the backup-platform lab. The solid path was transferred and checksum-verified; the dotted recovery path is planned and remains pending validation.
+This detailed view expands the backup portion of the main topology. It represents the **recorded ProxyLab file-transfer path**, separate from the Restic repository used in the backup-platform lab. The backup transfer and checksum-verification path is recorded, and the isolated database/application recovery path has been validated.
 
 ```mermaid
 flowchart LR
@@ -85,8 +85,8 @@ flowchart LR
     FILES --> CHECK
   end
   DEST --> FILES
-  CHECK -. "next step — restore not yet validated" .-> RESTORE["Isolated restore workspace"]
-  RESTORE -. "validate after restore" .-> VALIDATE["Restore SQL into test DB<br/>check schema and known rows<br/>check config permissions<br/>test application health"]
+  CHECK --> RESTORE["Isolated restore workspace<br/>SQL restored to proxylab_restore_test"]
+  RESTORE --> VALIDATE["Validation passed<br/>4 expected product rows<br/>recovery API /health + /products: HTTP 200"]
 ```
 
 ### Backup/recovery interpretation
@@ -94,7 +94,8 @@ flowchart LR
 - **Recorded:** backup artifacts were transferred from `192.168.6.141` to `192.168.6.143` over SSH/SCP using a dedicated key.
 - **Recorded:** `sha256sum -c SHA256SUMS` returned `proxylab.sql: OK` and `proxylab-configs.tar.gz: OK`.
 - **Destination caveat:** verified files were in `/home/debian/proxylab-backups/20261020_130223`, not `/backup/restic-repo`. Do not interpret this diagram as proof that the transferred files are Restic snapshots.
-- **Pending:** restore the SQL dump to a separate test database, inspect/extract the config archive in an isolated directory, validate data and permissions, test application recovery, and record elapsed time. Dotted arrows denote planned work, not a passed recovery test.
+- **Validated:** SQL was restored to the separate `proxylab_restore_test` database; the least-privilege recovery account read the four expected product rows; the isolated recovery API returned HTTP 200 for `/health` and `/products`.
+- **Still not tested:** production cutover, full-VM recovery, and measured recovery duration/RTO/RPO. TLS trust/hostname validation is tracked separately.
 - A checksum match proves integrity against the checksum manifest; it does not prove database consistency, application recovery, whole-VM recovery, immutability, or off-site protection.
 
 ## Backend resilience validation — 21 October 2026

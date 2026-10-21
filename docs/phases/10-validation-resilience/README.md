@@ -36,8 +36,20 @@ Recorded outputs: direct backends returned their healthy JSON with HTTP 200; ini
 - HTTPS testing used `curl -k`; certificate trust and hostname verification remain pending.
 - No formal recovery-time measurement or RTO/RPO validation was performed.
 
+## Isolated database/application recovery — 21 October 2026
+
+**Result: recovery API and restricted database access verified for the isolated test instance.**
+
+- Recovery Gunicorn master PID 3375 was configured with `DB_HOST=127.0.0.1`, `DB_USER=proxyapp_recovery`, and `DB_NAME=proxylab_restore_test`; its working directory was the extracted app under `/home/debian/proxylab-restore-test.TVpkdX/config-inspection/opt/proxylab/app`.
+- The grant check showed SELECT-only access on `proxylab_restore_test.*` for `proxyapp_recovery@localhost`.
+- Interactive TCP authentication as that account succeeded. `SELECT id, name FROM products ORDER BY id;` returned IDs 1–4: Laptop, Keyboard, Mouse and Monitor. `SELECT DATABASE(), CURRENT_USER();` returned `proxylab_restore_test` and `proxyapp_recovery@localhost`.
+- The recovery API at `127.0.0.1:5055` returned HTTP 200 from both `/health` and `/products`; the products endpoint returned the four expected records.
+
+This confirms the isolated restored test database is readable through the least-privilege account and that the recovery API responds. It does **not** prove production cutover, full-VM recovery, TLS certificate trust/hostname validation, or measured RTO/RPO. The SQL dump and configuration archive remain sensitive artifacts and must not be committed.
+
 ## Detailed notes
 - [Security assessment evidence, commands and results](security-assessment.md)
 - [Controlled backend failure/recovery runbook and recorded results](backend-failover-runbook.md)
+- [Backup and disaster-recovery restore evidence](../09-backup-disaster-recovery/README.md)
 
 TLS trust/hostname verification remains pending; test without `-k` using the intended hostname and trusted CA.

@@ -1,6 +1,6 @@
 # Phase 10B — Controlled backend failure and recovery
 
-**Status: planned; do not mark passed until actually executed.**
+**Status: executed successfully on 21 October 2026 for both single-backend failure directions.** The actual results are recorded below; the test does not establish active upstream health checks or production-grade HA.
 
 ## Flow
 
@@ -81,10 +81,66 @@ sudo journalctl -u "$SERVICE" --since "10 minutes ago" --no-pager
 ```
 
 ## Acceptance criteria
-- [ ] Baseline checks pass for both backends.
-- [ ] Stopped backend is unavailable directly.
-- [ ] Nginx behavior during the fault is recorded exactly.
-- [ ] Stopped service starts successfully.
-- [ ] Both direct health checks pass after recovery.
-- [ ] Both identities return through Nginx again.
-- [ ] Actual status codes, logs, timing and limitations are saved.
+- [x] Baseline checks pass for both backends.
+- [ ] Stopped backend is unavailable directly (direct fault response was not captured).
+- [x] Nginx behavior during both service-stop faults was recorded: 8/8 HTTP 200 health responses from the surviving backend in each direction.
+- [x] Each stopped service started successfully.
+- [x] Final validation confirmed both services active and both ports 5000/5001 listening.
+- [x] Final Nginx checks showed both backend identities; 10/10 health requests returned HTTP 200.
+- [x] Products endpoint returned HTTP 200 and the four expected products during both failure scenarios and final validation.
+- [ ] TLS trust/hostname verification without `curl -k` remains pending.
+
+## 5. Executed test evidence — 21 October 2026
+
+### Baseline
+- Nginx and MariaDB were active.
+- `proxylab.service` (backend 1) and `proxylab-backend2.service` (backend 2) were active.
+- Ports 443, 5000 and 5001 were listening; Nginx upstream contained `127.0.0.1:5000` and `127.0.0.1:5001`.
+- HTTPS `/health` and `/products` returned HTTP 200; `/products` contained Laptop, Keyboard, Mouse and Monitor.
+- `sudo nginx -t` passed.
+
+### Fault A — backend 1 stopped
+Commands executed included `sudo systemctl stop proxylab.service`, repeated HTTPS health checks (8 requests), a products check, backend 2 service/listener checks, and a tail of `/var/log/nginx/error.log`.
+
+Observed:
+- `proxylab.service` became `inactive`; `proxylab-backend2.service` stayed `active`.
+- All 8 health requests returned HTTP 200 and `"backend":"backend-2"`.
+- `/products` returned HTTP 200 and all four products.
+- Port 5001 remained listening.
+
+### Recovery A — backend 1 restarted
+Commands included `sudo systemctl start proxylab.service`, service status checks, repeated HTTPS health checks (8 requests), products check and `journalctl`.
+
+Observed:
+- Both backend services reported `active`.
+- All 8 health requests returned HTTP 200 and showed both backend identities.
+- `/products` returned HTTP 200 and all four products.
+- Journal showed Gunicorn starting and listening at `127.0.0.1:5000`.
+- One intermediate listener grep showed only port 5001; the final validation later confirmed both ports listening.
+
+### Fault B — backend 2 stopped
+Commands executed included `sudo systemctl stop proxylab-backend2.service`, repeated HTTPS health checks (8 requests), a products check, backend 1 listener check and a tail of `/var/log/nginx/error.log`.
+
+Observed:
+- `proxylab-backend2.service` became `inactive`; `proxylab.service` stayed `active`.
+- All 8 health requests returned HTTP 200 and `"backend":"backend-1"`.
+- `/products` returned HTTP 200 and all four products.
+- Port 5000 remained listening.
+
+### Recovery B and final state
+Commands included `sudo systemctl start proxylab-backend2.service`, status checks for Nginx, MariaDB and both backends, listener checks, `sudo nginx -t`, 10 health requests, a products check and backend 2 journal review.
+
+Observed:
+- Nginx, MariaDB, `proxylab.service` and `proxylab-backend2.service` all reported `active`.
+- Both `127.0.0.1:5000` and `127.0.0.1:5001` were listening.
+- `nginx -t` succeeded.
+- All 10 health requests returned HTTP 200 and identified both backend 1 and backend 2.
+- `/products` returned HTTP 200 with all four expected products.
+- Backend 2 journal showed Gunicorn listening at `127.0.0.1:5001` and workers booting.
+
+### Caveats and troubleshooting
+- The generic `/var/log/nginx/error.log` check printed no lines. The virtual host specifies `/var/log/nginx/proxylab_error.log`; use the configured path for future diagnostics.
+- Direct requests to the stopped backend were not captured, so the exact direct-failure response is not claimed as verified.
+- `curl -k` skips certificate validation. TLS trust and hostname verification remain pending.
+- The Nginx upstream configuration has no active-health-check directive. These tests establish observed behavior for controlled systemd stops, not every crash scenario or production-grade HA.
+- No formal RTO/RPO or measured recovery duration was recorded.

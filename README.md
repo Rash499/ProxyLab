@@ -10,7 +10,7 @@ The diagram below shows the end-to-end ProxyLab topology, including the Nginx re
 
 ```mermaid
 flowchart TB
-  Client["LAN clients<br/>192.168.6.0/24"] -->|"HTTP / HTTPS"| FW["Host firewall"]
+  Client["LAN clients<br/>192.168.x.0/24"] -->|"HTTP / HTTPS"| FW["Host firewall"]
   Client -->|"Forward proxy :3128"| FW
   Admin["Administrator"] -->|"SSH :22 / public key"| FW
   subgraph VM["Debian 13 ProxyLab — 192.168.xxx.xxx"]
@@ -60,15 +60,15 @@ flowchart TB
 | Component | Recorded value |
 |---|---|
 | OS | Debian 13 |
-| ProxyLab VM | 192.168.6.141/24 |
-| Gateway/DNS | 192.168.6.2 |
+| ProxyLab VM | 192.168.xxx.xxx |
+| Gateway/DNS | 192.168.xxx.xxx |
 | Nginx | TCP 80 and 443 |
 | Backend 1 | 127.0.0.1:5000, proxylab.service |
 | Backend 2 | 127.0.0.1:5001, proxylab-backend2.service |
 | MariaDB | 127.0.0.1:3306, database proxylab |
 | Squid | TCP 3128, intended for lab-subnet clients |
 | Application | /opt/proxylab/app |
-| Backup VM | 192.168.6.143 |
+| Backup VM | 192.168.xxx.xxx |
 
 These are lab values, not instructions to expose a VM publicly. Review all firewall and access-control rules before adapting.
 
